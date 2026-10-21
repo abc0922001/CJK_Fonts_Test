@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CJK 跨地域字形差異與原生字體檢測儀</title>
+  <title>漢字五方：CJK 跨地域字形一覽與本機字體檢測</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -12,7 +12,6 @@
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
       --danger: #f43f5e;
       --success: #10b981;
       --warning: #f59e0b;
@@ -27,9 +26,9 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       line-height: 1.5;
-      padding: 24px 16px;
+      padding: 20px 14px 40px;
     }
 
     .container {
@@ -38,72 +37,44 @@
     }
 
     header {
-      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      margin-bottom: 20px;
       border-bottom: 1px solid var(--card-border);
       padding-bottom: 16px;
     }
 
     h1 {
-      font-size: 1.8rem;
+      font-size: 1.65rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     p.desc {
       color: var(--text-sub);
-      font-size: 0.95rem;
-    }
-
-    .control-panel {
-      background-color: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 24px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .input-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    label {
       font-size: 0.9rem;
-      color: var(--text-sub);
     }
 
-    input[type="text"] {
-      background: #0b1120;
-      border: 1px solid var(--card-border);
-      color: #fff;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 1.2rem;
-      width: 140px;
-      text-align: center;
-    }
-
-    .btn-group {
+    .toolbar {
       display: flex;
       gap: 8px;
+      align-items: center;
       flex-wrap: wrap;
     }
 
     button {
       background: #334155;
       color: var(--text-main);
-      border: none;
+      border: 1px solid #475569;
       padding: 8px 14px;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: background 0.2s;
+      font-size: 0.88rem;
+      transition: all 0.15s;
     }
 
     button:hover {
@@ -112,60 +83,196 @@
 
     button.active {
       background: var(--accent);
-      color: #0f172a;
-      font-weight: 600;
+      color: #090d16;
+      border-color: var(--accent);
+      font-weight: 700;
     }
 
-    .grid-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+    /* 診斷報告區塊 */
+    .diagnostic-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 18px;
       margin-bottom: 24px;
     }
 
-    .card {
+    .diag-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .diag-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+
+    .status-badge.ok {
+      background: rgba(16, 185, 129, 0.18);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .status-badge.warn {
+      background: rgba(245, 158, 11, 0.18);
+      color: var(--warning);
+      border: 1px solid var(--warning);
+    }
+
+    .status-badge.danger {
+      background: rgba(244, 63, 94, 0.18);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .matrix-item {
+      background: #090d16;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .diag-summary-text {
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      background: #090d16;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border-left: 4px solid var(--accent);
+    }
+
+    /* 差異字展示列 */
+    .char-showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .char-row {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 16px;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    @media (max-width: 820px) {
+      .char-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .char-info {
+      border-right: 1px solid var(--card-border);
+      padding-right: 16px;
+    }
+
+    @media (max-width: 820px) {
+      .char-info {
+        border-right: none;
+        border-bottom: 1px solid var(--card-border);
+        padding-right: 0;
+        padding-bottom: 12px;
+      }
+    }
+
+    .char-info .title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .char-info .unicode {
+      font-size: 0.78rem;
+      font-family: monospace;
+      color: var(--text-sub);
+      background: #090d16;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .char-info .feature-desc {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin-top: 6px;
+    }
+
+    .region-boxes {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .region-boxes {
+        grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+      }
+    }
+
+    .region-card {
+      background: #090d16;
+      border: 1px solid #263349;
+      border-radius: 8px;
+      padding: 10px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      position: relative;
+      text-align: center;
     }
 
-    .card-header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 8px;
-      margin-bottom: 12px;
-      font-size: 0.85rem;
+    .region-label {
+      font-size: 0.75rem;
       color: var(--text-sub);
-    }
-
-    .card-header .tag {
-      font-weight: bold;
-      color: var(--accent);
-    }
-
-    .char-box {
-      width: 100%;
-      height: 180px;
+      margin-bottom: 6px;
       display: flex;
-      justify-content: center;
+      gap: 4px;
       align-items: center;
-      background: #090d16;
-      border-radius: 6px;
-      border: 1px dashed #334155;
-      position: relative;
-      user-select: none;
     }
 
-    .char-preview {
-      font-size: 110px;
-      line-height: 1;
+    .region-label code {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .glyph-display {
+      font-size: 72px;
+      line-height: 1.1;
+      margin: 4px 0;
+      user-select: all;
     }
 
     .font-sans {
@@ -176,121 +283,19 @@
       font-family: serif !important;
     }
 
-    .card-footer {
-      width: 100%;
-      margin-top: 12px;
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      text-align: center;
+    .region-note {
+      font-size: 0.74rem;
+      color: #94a3b8;
+      margin-top: 6px;
     }
 
-    .quick-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-bottom: 24px;
-      background: var(--card-bg);
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: 1px solid var(--card-border);
-    }
-
-    .quick-list span {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-    }
-
-    .badge-btn {
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      padding: 4px 10px;
-      font-size: 0.85rem;
-      border-radius: 4px;
-    }
-
-    .diagnostic-panel {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .diag-title {
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: var(--accent);
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-
-    .status-badge.ok {
-      background: rgba(16, 185, 129, 0.2);
-      color: var(--success);
-      border: 1px solid var(--success);
-    }
-
-    .status-badge.warn {
-      background: rgba(245, 158, 11, 0.2);
-      color: var(--warning);
-      border: 1px solid var(--warning);
-    }
-
-    .status-badge.danger {
-      background: rgba(244, 63, 94, 0.2);
-      color: var(--danger);
-      border: 1px solid var(--danger);
-    }
-
-    .diag-log {
-      background: #090d16;
-      border-radius: 6px;
-      padding: 12px;
-      font-family: Consolas, Monaco, "Courier New", monospace;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-      max-height: 260px;
-      overflow-y: auto;
-      border: 1px solid #1e293b;
-    }
-
-    .diag-log p {
-      margin-bottom: 6px;
-    }
-
-    .diag-log .highlight {
-      color: var(--accent);
-    }
-
-    .diag-log .text-warn {
-      color: var(--warning);
-    }
-
-    .diag-log .text-danger {
-      color: var(--danger);
-    }
-
-    .diag-log .text-success {
-      color: var(--success);
-    }
-
-    /* 測量用隱藏 DOM 容器 */
-    #metric-sandbox {
-      position: absolute;
+    /* 掛載於 DOM 的隱藏檢測用畫布 */
+    #hidden-probe-container {
+      position: fixed;
       left: -9999px;
       top: -9999px;
-      visibility: hidden;
-      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
     }
   </style>
 </head>
@@ -298,299 +303,325 @@
 
   <div class="container">
     <header>
-      <h1>漢字五方：CJK 原生語系字形差異與本機字體檢測儀</h1>
-      <p class="desc">
-        本工具嚴格遵循「不指定任何特定字體名稱」，純粹透過 HTML 原生 <code>lang</code> 語系標記與通用關鍵字 <code>sans-serif</code> / <code>serif</code>，檢視訪客裝置作業系統的原生字體映射與字形差異。
-      </p>
+      <div>
+        <h1>漢字五方：CJK 跨地域字形一覽與本機字體檢測</h1>
+        <p class="desc">
+          不指定任何特定字型名稱，純粹透過 HTML 原生 <code>lang</code> 屬性（<code>zh-TW</code> / <code>zh-CN</code> / <code>ja</code> / <code>ko</code> / <code>zh-HK</code>）直接展示五地書寫差異並檢測系統字體支援度。
+        </p>
+      </div>
+      <div class="toolbar">
+        <button id="btn-sans" class="active" onclick="setGenericFamily('sans-serif')">無襯線黑體 (sans-serif)</button>
+        <button id="btn-serif" onclick="setGenericFamily('serif')">有襯線明/宋體 (serif)</button>
+      </div>
     </header>
 
-    <div class="control-panel">
-      <div class="input-group">
-        <label for="char-input">測試字：</label>
-        <input type="text" id="char-input" value="骨" maxlength="4">
+    <!-- 自動本機字體診斷面板 -->
+    <section class="diagnostic-panel">
+      <div class="diag-header">
+        <div class="diag-title">
+          <span>裝置原生 CJK 語系字體獨立性診斷</span>
+          <span id="diag-badge" class="status-badge">檢測中...</span>
+        </div>
+        <button onclick="runFontDiagnostics()">重新檢測</button>
       </div>
+      <div id="diag-matrix" class="matrix-grid"></div>
+      <div id="diag-conclusion" class="diag-summary-text"></div>
+    </section>
 
-      <div class="input-group">
-        <label>通用字族：</label>
-        <div class="btn-group">
-          <button id="btn-sans" class="active" onclick="switchFontFamily('sans-serif')">黑體 (sans-serif)</button>
-          <button id="btn-serif" onclick="switchFontFamily('serif')">明體/宋體 (serif)</button>
-        </div>
-      </div>
-
-      <div class="input-group">
-        <button onclick="runFallbackDiagnostics()" style="background-color: var(--accent); color: #090d16; font-weight: bold;">
-          執行本機字體診斷
-        </button>
-      </div>
-    </div>
-
-    <div class="quick-list">
-      <span>精選差異字：</span>
-      <button class="badge-btn" onclick="setTestChar('骨')">骨 (骨架出頭)</button>
-      <button class="badge-btn" onclick="setTestChar('直')">直 (直/橫筆方向)</button>
-      <button class="badge-btn" onclick="setTestChar('角')">角 (中央穿透)</button>
-      <button class="badge-btn" onclick="setTestChar('刃')">刃 (點筆方向)</button>
-      <button class="badge-btn" onclick="setTestChar('草')">草 (艹字頭演變)</button>
-      <button class="badge-btn" onclick="setTestChar('雪')">雪 (雨字頭點折)</button>
-      <button class="badge-btn" onclick="setTestChar('器')">器 (大/犬字底)</button>
-      <button class="badge-btn" onclick="setTestChar('戶')">戶 (戶/户/戸)</button>
-      <button class="badge-btn" onclick="setTestChar('變')">變 (繁簡日新字)</button>
-    </div>
-
-    <!-- 五地字形展示卡片 -->
-    <div class="grid-cards">
-      <div class="card">
-        <div class="card-header">
-          <span>台灣標準 (TW)</span>
-          <span class="tag">zh-TW</span>
-        </div>
-        <div class="char-box">
-          <span id="char-tw" class="char-preview font-sans" lang="zh-TW">骨</span>
-        </div>
-        <div class="card-footer">教育部標準字體</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span>中國規範 (CN)</span>
-          <span class="tag">zh-CN</span>
-        </div>
-        <div class="char-box">
-          <span id="char-cn" class="char-preview font-sans" lang="zh-CN">骨</span>
-        </div>
-        <div class="card-footer">通用規範漢字 (新字形)</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span>日本新字體 (JA)</span>
-          <span class="tag">ja</span>
-        </div>
-        <div class="char-box">
-          <span id="char-ja" class="char-preview font-sans" lang="ja">骨</span>
-        </div>
-        <div class="card-footer">常用漢字 (JIS 標準)</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span>韓國傳統字 (KO)</span>
-          <span class="tag">ko</span>
-        </div>
-        <div class="char-box">
-          <span id="char-ko" class="char-preview font-sans" lang="ko">骨</span>
-        </div>
-        <div class="card-footer">康熙字典傳承體 (KS 標準)</div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <span>香港常用字 (HK)</span>
-          <span class="tag">zh-HK</span>
-        </div>
-        <div class="char-box">
-          <span id="char-hk" class="char-preview font-sans" lang="zh-HK">骨</span>
-        </div>
-        <div class="card-footer">常用字字形表</div>
-      </div>
-    </div>
-
-    <!-- 原生字體檢測診斷儀面板 -->
-    <div class="diagnostic-panel">
-      <div class="diag-title">
-        <span>本機 CJK 語系回退（Fallback）診斷報告</span>
-        <span id="diagnostic-summary" class="status-badge ok">就緒</span>
-      </div>
-      <div id="diag-output" class="diag-log">
-        <p>點擊上方「執行本機字體診斷」或直接修改測試字，即可開始分析目前裝置是否為單一字體回退。</p>
-      </div>
-    </div>
+    <!-- 10 組經典 CJK 差異漢字一覽 -->
+    <main id="showcase-container" class="char-showcase"></main>
   </div>
 
-  <!-- 隱藏的 DOM 測量沙盒（避免任何 Canvas 跨域污染） -->
-  <div id="metric-sandbox"></div>
+  <!-- 必須實際掛載於 DOM 樹中，瀏覽器才會針對 lang 屬性切換系統字體 -->
+  <div id="hidden-probe-container">
+    <canvas id="probe-canvas" width="96" height="96"></canvas>
+  </div>
 
   <script>
     let currentFamily = 'sans-serif';
-    const regions = [
-      { code: 'zh-TW', name: '台灣 (zh-TW)', elId: 'char-tw' },
-      { code: 'zh-CN', name: '中國 (zh-CN)', elId: 'char-cn' },
-      { code: 'ja',    name: '日本 (ja)',    elId: 'char-ja' },
-      { code: 'ko',    name: '韓國 (ko)',    elId: 'char-ko' },
-      { code: 'zh-HK', name: '香港 (zh-HK)', elId: 'char-hk' }
+
+    // 精選 10 個同一個 Unicode 碼位、但在台/中/日/韓/港有鮮明筆形差異的代表字
+    const CHAR_DATA = [
+      {
+        char: '骨',
+        code: 'U+9AA8',
+        feature: '上方骨頭內部方向與下方「月（肉）」首筆',
+        notes: {
+          'zh-TW': '上內右折・下首筆豎',
+          'zh-CN': '上內左折・下首筆豎',
+          'ja':    '上內左折・下首筆豎',
+          'ko':    '上內右折・下首筆撇',
+          'zh-HK': '上內右折・下首筆撇'
+        }
+      },
+      {
+        char: '直',
+        code: 'U+76F4',
+        feature: '下方末筆長橫與左側豎筆的組合結構',
+        notes: {
+          'zh-TW': '下橫與上目相連無左豎',
+          'zh-CN': '下橫與上目相連無左豎',
+          'ja':    '左側帶L形豎折托底',
+          'ko':    '左側帶L形豎折托底',
+          'zh-HK': '左側帶L形豎折托底'
+        }
+      },
+      {
+        char: '角',
+        code: 'U+89D2',
+        feature: '下半部「用」中央的豎筆是否向下穿透第2橫',
+        notes: {
+          'zh-TW': '中豎不穿透底橫',
+          'zh-CN': '中豎向下穿透出頭',
+          'ja':    '中豎不穿透底橫',
+          'ko':    '中豎不穿透底橫',
+          'zh-HK': '中豎不穿透底橫'
+        }
+      },
+      {
+        char: '刃',
+        code: 'U+5203',
+        feature: '左側點畫與刀部撇畫的交接方式',
+        notes: {
+          'zh-TW': '點向右下（不穿撇）',
+          'zh-CN': '點向右下穿過撇畫',
+          'ja':    '左側為短右斜點',
+          'ko':    '點穿過撇畫',
+          'zh-HK': '點向右下（不穿撇）'
+        }
+      },
+      {
+        char: '草',
+        code: 'U+8349',
+        feature: '上方「艹（艸部）」是相連還是斷開為十十',
+        notes: {
+          'zh-TW': '四畫斷開（十＋十）',
+          'zh-CN': '三畫一體橫連',
+          'ja':    '三畫一體橫連',
+          'ko':    '四畫傳統兩段式',
+          'zh-HK': '四畫傳統兩段式'
+        }
+      },
+      {
+        char: '雪',
+        code: 'U+96EA',
+        feature: '雨字頭內部四點方向與下方「彐」字形',
+        notes: {
+          'zh-TW': '四點斜向・中橫不出頭',
+          'zh-CN': '四點短橫・中橫不出頭',
+          'ja':    '中橫不穿透右折',
+          'ko':    '傳統雨頭・右折微出',
+          'zh-HK': '傳統雨頭點畫'
+        }
+      },
+      {
+        char: '器',
+        code: 'U+5668',
+        feature: '中央部位是「犬（有一點）」還是「大（無點）」',
+        notes: {
+          'zh-TW': '中央為「犬」（有右點）',
+          'zh-CN': '中央為「大」（無點）',
+          'ja':    '中央為「大」（無點）',
+          'ko':    '中央為「犬」（有右點）',
+          'zh-HK': '中央為「犬」（有右點）'
+        }
+      },
+      {
+        char: '真',
+        code: 'U+771F',
+        feature: '上方是「十」或「匕」，以及內部與左豎連結關係',
+        notes: {
+          'zh-TW': '上為十・下橫直接連目',
+          'zh-CN': '上為十・下橫直接連目',
+          'ja':    '上為十・左側帶豎折框',
+          'ko':    '傳統常作眞（上匕）',
+          'zh-HK': '上為十・左側帶豎折框'
+        }
+      },
+      {
+        char: '空',
+        code: 'U+7A7A',
+        feature: '穴字頭下方兩筆是「八（撇、點）」還是「儿（撇、豎彎）」',
+        notes: {
+          'zh-TW': '穴下為「八」（撇＋長頓點）',
+          'zh-CN': '穴下為「儿」（撇＋豎折鉤）',
+          'ja':    '穴下為「儿」（撇＋豎彎）',
+          'ko':    '穴下為「八」（撇＋點）',
+          'zh-HK': '穴下為「八」（撇＋點）'
+        }
+      },
+      {
+        char: '道',
+        code: 'U+9053',
+        feature: '走之底（辶）左側點畫數與彎折造形',
+        notes: {
+          'zh-TW': '一點・下方雙折彎',
+          'zh-CN': '一點・橫折折撇',
+          'ja':    '一點・平滑單折彎',
+          'ko':    '二點（傳統雙點辶）',
+          'zh-HK': '一點・傳統書寫折彎'
+        }
+      }
     ];
 
-    const input = document.getElementById('char-input');
-    input.addEventListener('input', (e) => {
-      const val = e.target.value.trim() || '骨';
-      updateCharacters(val);
-      runFallbackDiagnostics();
-    });
+    const REGIONS = [
+      { code: 'zh-TW', label: '台灣' },
+      { code: 'zh-CN', label: '中國' },
+      { code: 'ja',    label: '日本' },
+      { code: 'ko',    label: '韓國' },
+      { code: 'zh-HK', label: '香港' }
+    ];
 
-    function setTestChar(char) {
-      input.value = char;
-      updateCharacters(char);
-      runFallbackDiagnostics();
+    function renderShowcase() {
+      const container = document.getElementById('showcase-container');
+      const familyClass = currentFamily === 'sans-serif' ? 'font-sans' : 'font-serif';
+
+      container.innerHTML = CHAR_DATA.map(item => {
+        const cardsHtml = REGIONS.map(r => `
+          <div class="region-card">
+            <div class="region-label">
+              <span>${r.label}</span>
+              <code>${r.code}</code>
+            </div>
+            <div class="glyph-display ${familyClass}" lang="${r.code}">${item.char}</div>
+            <div class="region-note">${item.notes[r.code]}</div>
+          </div>
+        `).join('');
+
+        return `
+          <div class="char-row">
+            <div class="char-info">
+              <div class="title">
+                <span>「${item.char}」</span>
+                <span class="unicode">${item.code}</span>
+              </div>
+              <div class="feature-desc">${item.feature}</div>
+            </div>
+            <div class="region-boxes">
+              ${cardsHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    function updateCharacters(char) {
-      regions.forEach(r => {
-        document.getElementById(r.elId).textContent = char;
-      });
-    }
-
-    function switchFontFamily(family) {
+    function setGenericFamily(family) {
       currentFamily = family;
-      const btnSans = document.getElementById('btn-sans');
-      const btnSerif = document.getElementById('btn-serif');
-
-      if (family === 'sans-serif') {
-        btnSans.classList.add('active');
-        btnSerif.classList.remove('active');
-      } else {
-        btnSerif.classList.add('active');
-        btnSans.classList.remove('active');
-      }
-
-      regions.forEach(r => {
-        const el = document.getElementById(r.elId);
-        el.className = `char-preview font-${family === 'sans-serif' ? 'sans' : 'serif'}`;
-      });
-
-      runFallbackDiagnostics();
+      document.getElementById('btn-sans').classList.toggle('active', family === 'sans-serif');
+      document.getElementById('btn-serif').classList.toggle('active', family === 'serif');
+      renderShowcase();
+      runFontDiagnostics();
     }
 
-    // 利用純本機 Canvas 繪製並即時計算像素簽章（完全同源，保證無 SecurityError）
-    function getCanvasSignature(char, lang, family) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 64;
-      canvas.height = 64;
+    /**
+     * 將 Canvas 實際掛載於 DOM 並動態指定 lang 屬性與強制重新計算樣式，
+     * 同時一次繪製多個差異字（「骨直角刃道草空器」）來提取精準像素簽章。
+     */
+    function captureLangCanvasData(langCode, family) {
+      const canvas = document.getElementById('probe-canvas');
       const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-      ctx.clearRect(0, 0, 64, 64);
-      ctx.fillStyle = '#ffffff';
-      ctx.textBaseline = 'middle';
-      ctx.textAlign = 'center';
-      
-      // 注意：僅套用通用關鍵字與 Canvas 2D direction/lang 特徵
-      ctx.font = `48px ${family}`;
-      ctx.fillText(char, 32, 32);
+      // 關鍵步驟：設定 DOM 上的 lang 屬性與通用字族，並讀取 computedStyle 強迫瀏覽器更新語系字體映射
+      canvas.setAttribute('lang', langCode);
+      canvas.style.fontFamily = family;
+      void window.getComputedStyle(canvas).fontFamily;
 
-      // 提取像素點陣雜湊
-      const imgData = ctx.getImageData(0, 0, 64, 64).data;
-      let hash = 0;
-      for (let i = 0; i < imgData.length; i += 4) {
-        // 只累加透明度通道與亮度
-        const alpha = imgData[i + 3];
-        if (alpha > 0) {
-          hash = ((hash << 5) - hash) + (imgData[i] + alpha);
-          hash |= 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffffff';
+      ctx.textBaseline = 'top';
+      ctx.font = `36px ${family}`;
+
+      // 分兩行繪製 4 個最具鑑別度的漢字：骨、直、角、道
+      ctx.fillText('骨直', 4, 4);
+      ctx.fillText('角道', 4, 46);
+
+      return ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    }
+
+    function countPixelDifferences(dataA, dataB) {
+      let diff = 0;
+      for (let i = 3; i < dataA.length; i += 4) {
+        if (Math.abs(dataA[i] - dataB[i]) > 15) {
+          diff++;
         }
       }
-      return { hash, imgData };
+      return diff;
     }
 
-    // 利用 DOM 高精密度浮點數邊框幾何（getBoundingClientRect）測量各地區字體特性
-    function getDOMMetrics(char, lang, family) {
-      const sandbox = document.getElementById('metric-sandbox');
-      sandbox.innerHTML = '';
+    function runFontDiagnostics() {
+      const matrixEl = document.getElementById('diag-matrix');
+      const badgeEl = document.getElementById('diag-badge');
+      const conclusionEl = document.getElementById('diag-conclusion');
 
-      const span = document.createElement('span');
-      span.lang = lang;
-      span.style.fontFamily = family;
-      span.style.fontSize = '120px';
-      span.style.lineHeight = '1';
-      span.style.display = 'inline-block';
-      span.textContent = char;
-
-      sandbox.appendChild(span);
-      const rect = span.getBoundingClientRect();
-      return {
-        width: rect.width.toFixed(3),
-        height: rect.height.toFixed(3)
-      };
-    }
-
-    function runFallbackDiagnostics() {
-      const testChar = input.value.trim() || '骨';
-      const output = document.getElementById('diag-output');
-      const summary = document.getElementById('diagnostic-summary');
-      output.innerHTML = '';
-
-      const log = (msg, cls = '') => {
-        const p = document.createElement('p');
-        if (cls) p.className = cls;
-        p.innerHTML = msg;
-        output.appendChild(p);
-      };
-
-      log(`[檢測啟動] 測試目標字：「<strong>${testChar}</strong>」，通用字族：<code>${currentFamily}</code>`);
-
-      const results = {};
-      const signatures = {};
-
-      regions.forEach(r => {
-        const metrics = getDOMMetrics(testChar, r.code, currentFamily);
-        const sig = getCanvasSignature(testChar, r.code, currentFamily);
-        results[r.code] = metrics;
-        signatures[r.code] = sig;
+      const snapshots = {};
+      REGIONS.forEach(r => {
+        snapshots[r.code] = captureLangCanvasData(r.code, currentFamily);
       });
 
-      // 進行交叉比對：判斷是否所有地區的度量與像素完全重疊
-      const pairs = [
-        { a: 'zh-TW', b: 'zh-CN', label: '台灣 vs 中國' },
-        { a: 'zh-TW', b: 'ja',    label: '台灣 vs 日本' },
-        { a: 'zh-TW', b: 'ko',    label: '台灣 vs 韓國' },
-        { a: 'zh-TW', b: 'zh-HK', label: '台灣 vs 香港' }
+      // 檢測 6 組關鍵配對，能完整看出哪些語系獨立、哪些語系共用
+      const comparisons = [
+        { a: 'zh-TW', b: 'zh-CN', title: '台灣 vs 中國' },
+        { a: 'zh-TW', b: 'ja',    title: '台灣 vs 日本' },
+        { a: 'zh-TW', b: 'ko',    title: '台灣 vs 韓國' },
+        { a: 'zh-TW', b: 'zh-HK', title: '台灣 vs 香港' },
+        { a: 'zh-CN', b: 'ja',    title: '中國 vs 日本' },
+        { a: 'ja',    b: 'ko',    title: '日本 vs 韓國' }
       ];
 
-      let identicalCount = 0;
+      let diffPairsCount = 0;
+      matrixEl.innerHTML = comparisons.map(pair => {
+        const diffPixels = countPixelDifferences(snapshots[pair.a], snapshots[pair.b]);
+        const isDifferent = diffPixels > 0;
+        if (isDifferent) diffPairsCount++;
 
-      pairs.forEach(pair => {
-        const metA = results[pair.a];
-        const metB = results[pair.b];
-        const isDomIdentical = (metA.width === metB.width && metA.height === metB.height);
+        return `
+          <div class="matrix-item">
+            <span><strong>${pair.title}</strong></span>
+            <span style="color: ${isDifferent ? 'var(--success)' : 'var(--warning)'}; font-weight: 700;">
+              ${isDifferent ? `✓ 字形獨立 (差異 ${diffPixels} px)` : `＝ 字形相同 (共用回退)`}
+            </span>
+          </div>
+        `;
+      }).join('');
 
-        // 比對 Canvas 點陣是否有差異
-        let diffPixels = 0;
-        const dataA = signatures[pair.a].imgData;
-        const dataB = signatures[pair.b].imgData;
-        for (let i = 0; i < dataA.length; i += 4) {
-          if (Math.abs(dataA[i + 3] - dataB[i + 3]) > 10) {
-            diffPixels++;
-          }
-        }
-
-        const isExactMatch = isDomIdentical && (diffPixels === 0);
-
-        if (isExactMatch) {
-          identicalCount++;
-          log(`• <strong>${pair.label}</strong>：排版與像素相同 (寬: ${metA.width}px)。<span class="text-warn">[推測回退至同一本機字體]</span>`);
+      // 統計 5 個語系總共產生了幾種獨特的字形渲染結果
+      const uniqueGroups = [];
+      REGIONS.forEach(r => {
+        const matchedGroup = uniqueGroups.find(g => countPixelDifferences(g.data, snapshots[r.code]) === 0);
+        if (matchedGroup) {
+          matchedGroup.members.push(`${r.label}(${r.code})`);
         } else {
-          log(`• <strong>${pair.label}</strong>：偵測到字形排版或筆形細節差異 (寬差: ${(metA.width - metB.width).toFixed(3)}px, 差分點: ${diffPixels})。<span class="text-success">[獨立字體渲染]</span>`);
+          uniqueGroups.push({
+            data: snapshots[r.code],
+            members: [`${r.label}(${r.code})`]
+          });
         }
       });
 
-      // 總結診斷評級
-      if (identicalCount === pairs.length) {
-        summary.className = 'status-badge danger';
-        summary.textContent = '強烈警告：單一字體強制回退';
-        log(`<br><span class="text-danger"><strong>診斷結論：</strong> 目前作業系統或瀏覽器並未對不同 <code>lang</code> 標記映射出獨立的 CJK 地區字型，而是被系統回退（Fallback）機制導向了同一個預設字型（常見於缺乏完整 CJK 多語系字體包的精簡系統）。</span>`);
-      } else if (identicalCount > 0) {
-        summary.className = 'status-badge warn';
-        summary.textContent = '部分語系共用字體';
-        log(`<br><span class="text-warn"><strong>診斷結論：</strong> 系統支援部分語系獨立字形，但部分地區（如港台或中台）可能共用相同字庫或缺少特定語言標籤映射。</span>`);
+      const uniqueCount = uniqueGroups.length;
+      const groupSummary = uniqueGroups.map((g, idx) => `第 ${idx + 1} 組：[${g.members.join('、')}]`).join(' ； ');
+
+      if (uniqueCount === 1) {
+        badgeEl.className = 'status-badge danger';
+        badgeEl.textContent = `單一字體強制回退 (1/5 種字形)`;
+        conclusionEl.innerHTML = `<strong>診斷結論：</strong> 您的裝置在 <code>${currentFamily}</code> 模式下，對五個地區標籤渲染出完全相同的像素（${groupSummary}）。這代表系統強制使用單一字體顯示所有 CJK 漢字，或瀏覽器固定將所有語系指向同一套替換字體。`;
+      } else if (uniqueCount >= 4) {
+        badgeEl.className = 'status-badge ok';
+        badgeEl.textContent = `多語系支援完整 (${uniqueCount}/5 種獨立字形)`;
+        conclusionEl.innerHTML = `<strong>診斷結論：</strong> 您的裝置具備優良的 CJK 語系字體支援！在五個地區中共呈現出 <strong>${uniqueCount} 種獨立字形</strong>（分組狀態：${groupSummary}）。`;
       } else {
-        summary.className = 'status-badge ok';
-        summary.textContent = '多語系獨立支援正常';
-        log(`<br><span class="text-success"><strong>診斷結論：</strong> 恭喜！目前裝置對各國 <code>lang</code> 標籤具有高鑑別度，能自動使用符合當地規範的獨立原生字體進行渲染。</span>`);
+        badgeEl.className = 'status-badge warn';
+        badgeEl.textContent = `部分語系獨立 (${uniqueCount}/5 種獨立字形)`;
+        conclusionEl.innerHTML = `<strong>診斷結論：</strong> 您的裝置具備基本的 CJK 多語系區分能力，共呈現出 <strong>${uniqueCount} 種不同字形</strong>，但部分地區共用同一套字體（分組狀態：${groupSummary}）。`;
       }
     }
 
-    // 初次載入自動執行診斷
     window.addEventListener('DOMContentLoaded', () => {
-      runFallbackDiagnostics();
+      renderShowcase();
+      // 給予瀏覽器初次排版微幅緩衝後執行像素診斷
+      requestAnimationFrame(() => {
+        runFontDiagnostics();
+      });
     });
   </script>
 </body>
