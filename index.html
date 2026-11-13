@@ -3,19 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="text-scale" content="scale">
   <title>漢字五方：CJK 跨地域字形差異展示與即時測試</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --card-border: #334155;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --accent: #38bdf8;
+      color-scheme: light;
+
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --surface-subtle: #f1f5f9;
+      --card-border: #cbd5e1;
+      --control-border: #64748b;
+      --text-main: #0f172a;
+      --text-sub: #475569;
+      --text-body: #334155;
+      --accent: #0369a1;
+      --accent-text: #ffffff;
+      --btn-bg: #ffffff;
+      --btn-hover-bg: #e2e8f0;
+
+      accent-color: var(--accent);
     }
 
-    * {
+    :where(html, body, h1, h2, h3, p, ul, li, section, header, main, button, input) {
       box-sizing: border-box;
+    }
+
+    :where(body, h1, h2, h3, p, ul) {
       margin: 0;
       padding: 0;
     }
@@ -25,12 +40,13 @@
       color: var(--text-main);
       font-family: sans-serif;
       line-height: 1.5;
-      padding: 24px 16px 48px;
+      padding-block: 1.5rem 3rem;
+      padding-inline: 1rem;
     }
 
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
+      max-inline-size: 75rem;
+      margin-inline: auto;
     }
 
     header {
@@ -38,51 +54,77 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: flex-end;
-      gap: 16px;
-      margin-bottom: 24px;
-      border-bottom: 1px solid var(--card-border);
-      padding-bottom: 16px;
+      gap: 1rem;
+      margin-block-end: 1.5rem;
+      border-block-end: 1px solid var(--card-border);
+      padding-block-end: 1rem;
     }
 
     h1 {
       font-size: 1.65rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 6px;
+      margin-block-end: 0.375rem;
+      text-wrap: balance;
     }
 
     p.desc {
       color: var(--text-sub);
       font-size: 0.9rem;
+      max-inline-size: 65ch;
+      text-wrap: pretty;
     }
 
     .toolbar {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
       flex-wrap: wrap;
     }
 
     button {
-      background: #334155;
+      background: var(--btn-bg);
       color: var(--text-main);
-      border: 1px solid #475569;
-      padding: 8px 14px;
+      border: 1px solid var(--control-border);
+      padding-block: 0.5rem;
+      padding-inline: 0.875rem;
+      min-block-size: 2.5rem;
+      min-inline-size: 2.5rem;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.88rem;
-      transition: all 0.15s;
+      font-family: inherit;
     }
 
-    button:hover {
-      background: #475569;
+    @media (pointer: coarse) {
+      button {
+        min-block-size: 2.75rem;
+      }
     }
 
-    button.active {
+    @media (hover: hover) {
+      button:hover:not([aria-pressed="true"]) {
+        background: var(--btn-hover-bg);
+      }
+    }
+
+    button[aria-pressed="true"] {
       background: var(--accent);
-      color: #090d16;
+      color: var(--accent-text);
       border-color: var(--accent);
       font-weight: 700;
+    }
+
+    :where(button, input[type="text"], input[type="range"]):focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      button,
+      .input-wrapper input[type="text"] {
+        transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+      }
     }
 
     /* 自訂文字即時測試區塊 */
@@ -90,95 +132,96 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 28px;
+      padding: 1.25rem;
+      margin-block-end: 1.75rem;
     }
 
     .tester-controls {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 1rem;
       align-items: center;
-      margin-bottom: 16px;
+      margin-block-end: 1rem;
     }
 
     .input-wrapper {
-      flex: 1;
-      min-width: 260px;
+      flex: 1 1 16rem;
+      min-inline-size: 0;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
+      gap: 0.625rem;
     }
 
     .input-wrapper label {
       font-size: 0.95rem;
       font-weight: 700;
       color: var(--accent);
-      white-space: nowrap;
     }
 
     .input-wrapper input[type="text"] {
-      width: 100%;
-      background: #090d16;
-      border: 1px solid var(--card-border);
+      flex: 1 1 14rem;
+      min-inline-size: 0;
+      background: var(--surface-subtle);
+      border: 1px solid var(--control-border);
       color: var(--text-main);
-      padding: 10px 14px;
+      padding-block: 0.625rem;
+      padding-inline: 0.875rem;
+      min-block-size: 2.5rem;
       border-radius: 6px;
       font-size: 1.15rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .input-wrapper input[type="text"]:focus {
-      border-color: var(--accent);
+      font-family: inherit;
     }
 
     .size-wrapper {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
       font-size: 0.88rem;
       color: var(--text-sub);
     }
 
     .size-wrapper input[type="range"] {
-      accent-color: var(--accent);
       cursor: pointer;
+      min-block-size: 2.5rem;
     }
 
     .live-preview-grid {
+      list-style: none;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.75rem;
+      --test-size: 48px;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 56.25em) {
       .live-preview-grid {
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 11.25rem), 1fr));
       }
     }
 
     .live-card {
-      background: #090d16;
-      border: 1px solid #263349;
+      background: var(--surface-subtle);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 12px;
+      padding: 0.75rem;
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
-      min-height: 120px;
+      min-block-size: 7.5rem;
     }
 
     .live-card-header {
-      width: 100%;
+      inline-size: 100%;
       display: flex;
       justify-content: space-between;
+      gap: 0.5rem;
       font-size: 0.78rem;
       color: var(--text-sub);
-      border-bottom: 1px solid #1e293b;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
+      border-block-end: 1px solid var(--card-border);
+      padding-block-end: 0.375rem;
+      margin-block-end: 0.75rem;
     }
 
     .live-card-header code {
@@ -187,24 +230,27 @@
     }
 
     .live-glyph-text {
+      font-size: var(--test-size);
       word-break: break-all;
       line-height: 1.25;
-      margin: auto 0;
+      margin-block: auto;
       user-select: all;
     }
 
     /* 區塊標題 */
-    .section-title {
+    h2.section-title {
       font-size: 1.2rem;
       font-weight: 700;
       color: var(--text-main);
-      margin-bottom: 14px;
+      margin-block-end: 0.875rem;
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 0.625rem;
+      text-wrap: balance;
     }
 
-    .section-title span.sub {
+    h2.section-title span.sub {
       font-size: 0.85rem;
       font-weight: 400;
       color: var(--text-sub);
@@ -212,39 +258,46 @@
 
     /* 差異字展示列 */
     .char-showcase {
+      list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 1rem;
     }
 
     .char-row {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 16px;
+      padding: 1rem;
       display: grid;
-      grid-template-columns: 230px 1fr;
-      gap: 16px;
+      grid-template-columns: 14.375rem 1fr;
+      gap: 1rem;
       align-items: center;
     }
 
-    @media (max-width: 820px) {
+    /* 僅對初始視口以下的圖鑑卡片延遲渲染 */
+    .char-row:nth-child(n + 5) {
+      content-visibility: auto;
+      contain-intrinsic-size: auto none auto 11rem;
+    }
+
+    @media (max-width: 51.25em) {
       .char-row {
         grid-template-columns: 1fr;
       }
     }
 
     .char-info {
-      border-right: 1px solid var(--card-border);
-      padding-right: 16px;
+      border-inline-end: 1px solid var(--card-border);
+      padding-inline-end: 1rem;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 51.25em) {
       .char-info {
-        border-right: none;
-        border-bottom: 1px solid var(--card-border);
-        padding-right: 0;
-        padding-bottom: 12px;
+        border-inline-end: none;
+        border-block-end: 1px solid var(--card-border);
+        padding-inline-end: 0;
+        padding-block-end: 0.75rem;
       }
     }
 
@@ -252,44 +305,49 @@
       font-size: 1.25rem;
       font-weight: 700;
       color: var(--accent);
-      margin-bottom: 4px;
+      margin-block-end: 0.25rem;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .char-info .unicode {
       font-size: 0.78rem;
       font-family: monospace;
       color: var(--text-sub);
-      background: #090d16;
-      padding: 2px 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--card-border);
+      padding-block: 0.125rem;
+      padding-inline: 0.375rem;
       border-radius: 4px;
     }
 
     .char-info .feature-desc {
       font-size: 0.85rem;
-      color: #cbd5e1;
-      margin-top: 6px;
+      color: var(--text-body);
+      margin-block-start: 0.375rem;
+      text-wrap: pretty;
     }
 
     .region-boxes {
+      list-style: none;
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.625rem;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 37.5em) {
       .region-boxes {
-        grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 6rem), 1fr));
       }
     }
 
     .region-card {
-      background: #090d16;
-      border: 1px solid #263349;
+      background: var(--surface-subtle);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 10px 6px;
+      padding-block: 0.625rem;
+      padding-inline: 0.375rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -299,9 +357,9 @@
     .region-label {
       font-size: 0.75rem;
       color: var(--text-sub);
-      margin-bottom: 6px;
+      margin-block-end: 0.375rem;
       display: flex;
-      gap: 4px;
+      gap: 0.25rem;
       align-items: center;
     }
 
@@ -311,24 +369,40 @@
     }
 
     .glyph-display {
-      font-size: 72px;
+      font-size: 4.5rem;
       line-height: 1.1;
-      margin: 4px 0;
+      margin-block: 0.25rem;
       user-select: all;
     }
 
-    .font-sans {
-      font-family: sans-serif !important;
+    .preview-scope[data-font-family="sans-serif"] :is(.live-glyph-text, .glyph-display) {
+      font-family: sans-serif;
     }
 
-    .font-serif {
-      font-family: serif !important;
+    .preview-scope[data-font-family="serif"] :is(.live-glyph-text, .glyph-display) {
+      font-family: serif;
     }
 
     .region-note {
-      font-size: 0.74rem;
-      color: #94a3b8;
-      margin-top: 6px;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      margin-block-start: 0.375rem;
+    }
+
+    @media (forced-colors: active) {
+      button[aria-pressed="true"] {
+        background: Highlight;
+        color: HighlightText;
+        border-color: Highlight;
+        forced-color-adjust: none;
+      }
+
+      .live-card,
+      .region-card,
+      .custom-tester,
+      .char-row {
+        border: 1px solid CanvasText;
+      }
     }
   </style>
 </head>
@@ -342,40 +416,41 @@
           不指定任何特定字型名稱，純粹透過 HTML 原生 <code>lang</code> 屬性（<code>zh-TW</code> / <code>zh-CN</code> / <code>ja</code> / <code>ko</code> / <code>zh-HK</code>）展示五地書寫差異。
         </p>
       </div>
-      <div class="toolbar">
-        <button id="btn-sans" class="active" onclick="setGenericFamily('sans-serif')">無襯線黑體 (sans-serif)</button>
-        <button id="btn-serif" onclick="setGenericFamily('serif')">有襯線明/宋體 (serif)</button>
+      <div class="toolbar" role="toolbar" focusgroup="toolbar wrap" aria-label="字體類別切換" aria-controls="preview-root">
+        <button id="btn-sans" type="button" aria-pressed="true" data-family="sans-serif">無襯線黑體 (sans-serif)</button>
+        <button id="btn-serif" type="button" aria-pressed="false" data-family="serif">有襯線明/宋體 (serif)</button>
       </div>
     </header>
 
-    <!-- 自訂文字即時測試面板 -->
-    <section class="custom-tester">
-      <div class="tester-controls">
-        <div class="input-wrapper">
-          <label for="custom-input">自訂測試文字：</label>
-          <input type="text" id="custom-input" value="遲眾聽經亮以角沒化骨麵房空" placeholder="請輸入任意漢字進行五地字形比對...">
+    <main id="preview-root" class="preview-scope" data-font-family="sans-serif">
+      <!-- 自訂文字即時測試面板 -->
+      <section class="custom-tester">
+        <div class="tester-controls">
+          <div class="input-wrapper">
+            <label for="custom-input">自訂測試文字：</label>
+            <input type="text" id="custom-input" value="遲眾聽經亮以角沒化骨麵房空" placeholder="請輸入任意漢字進行五地字形比對...">
+          </div>
+          <div class="size-wrapper">
+            <label for="size-slider">字級大小：</label>
+            <input type="range" id="size-slider" min="28" max="110" value="48" aria-valuetext="48px">
+            <span id="size-val">48px</span>
+          </div>
         </div>
-        <div class="size-wrapper">
-          <label for="size-slider">字級大小：</label>
-          <input type="range" id="size-slider" min="28" max="110" value="48">
-          <span id="size-val">48px</span>
-        </div>
-      </div>
-      <div id="live-grid" class="live-preview-grid"></div>
-    </section>
+        <ul id="live-grid" class="live-preview-grid"></ul>
+      </section>
 
-    <!-- 20 組經典 CJK 差異漢字一覽 -->
-    <div class="section-title">
-      <span>代表性漢字五地書寫差異圖鑑（共 20 字）</span>
-      <span class="sub">點擊卡片內文字可直接選取複製</span>
-    </div>
-    <main id="showcase-container" class="char-showcase"></main>
+      <!-- 20 組經典 CJK 差異漢字一覽 -->
+      <section>
+        <h2 class="section-title">
+          <span>代表性漢字五地書寫差異圖鑑（共 20 字）</span>
+          <span class="sub">點擊卡片內文字可直接選取複製</span>
+        </h2>
+        <ul id="showcase-container" class="char-showcase"></ul>
+      </section>
+    </main>
   </div>
 
   <script>
-    let currentFamily = 'sans-serif';
-    let currentTestSize = 48;
-
     const REGIONS = [
       { code: 'zh-TW', label: '台灣' },
       { code: 'zh-CN', label: '中國' },
@@ -628,83 +703,152 @@
       }
     ];
 
-    function renderLiveTester() {
-      const text = document.getElementById('custom-input').value || '骨';
+    function createEl(tag, className, text) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (text !== undefined) el.textContent = text;
+      return el;
+    }
+
+    function initLiveTester(initialText) {
       const grid = document.getElementById('live-grid');
-      const familyClass = currentFamily === 'sans-serif' ? 'font-sans' : 'font-serif';
+      const fragment = document.createDocumentFragment();
+      const glyphNodes = [];
 
-      grid.innerHTML = REGIONS.map(r => `
-        <div class="live-card">
-          <div class="live-card-header">
-            <span>${r.label}標準</span>
-            <code>lang="${r.code}"</code>
-          </div>
-          <div class="live-glyph-text ${familyClass}" lang="${r.code}" style="font-size: ${currentTestSize}px;"></div>
-        </div>
-      `).join('');
+      for (const r of REGIONS) {
+        const card = createEl('li', 'live-card');
+        const header = createEl('div', 'live-card-header');
+        header.append(
+          createEl('span', '', `${r.label}標準`),
+          createEl('code', '', `lang="${r.code}"`)
+        );
 
-      // 使用 textContent 安全注入使用者輸入文字
-      const textNodes = grid.querySelectorAll('.live-glyph-text');
-      textNodes.forEach(node => {
-        node.textContent = text;
-      });
+        const glyph = createEl('div', 'live-glyph-text', initialText);
+        glyph.lang = r.code;
+        glyphNodes.push(glyph);
+
+        card.append(header, glyph);
+        fragment.append(card);
+      }
+
+      grid.append(fragment);
+      return glyphNodes;
     }
 
-    function renderShowcase() {
+    function initShowcase() {
       const container = document.getElementById('showcase-container');
-      const familyClass = currentFamily === 'sans-serif' ? 'font-sans' : 'font-serif';
+      const fragment = document.createDocumentFragment();
 
-      container.innerHTML = CHAR_DATA.map(item => {
-        const cardsHtml = REGIONS.map(r => `
-          <div class="region-card">
-            <div class="region-label">
-              <span>${r.label}</span>
-              <code>${r.code}</code>
-            </div>
-            <div class="glyph-display ${familyClass}" lang="${r.code}">${item.char}</div>
-            <div class="region-note">${item.notes[r.code]}</div>
-          </div>
-        `).join('');
+      for (const item of CHAR_DATA) {
+        const row = createEl('li', 'char-row');
 
-        return `
-          <div class="char-row">
-            <div class="char-info">
-              <div class="title">
-                <span>「${item.char}」</span>
-                <span class="unicode">${item.code}</span>
-              </div>
-              <div class="feature-desc">${item.feature}</div>
-            </div>
-            <div class="region-boxes">
-              ${cardsHtml}
-            </div>
-          </div>
-        `;
-      }).join('');
+        const info = createEl('div', 'char-info');
+        const title = createEl('h3', 'title');
+        title.append(
+          createEl('span', '', `「${item.char}」`),
+          createEl('span', 'unicode', item.code)
+        );
+        info.append(title, createEl('div', 'feature-desc', item.feature));
+
+        const boxes = createEl('ul', 'region-boxes');
+        for (const r of REGIONS) {
+          const card = createEl('li', 'region-card');
+          const label = createEl('div', 'region-label');
+          label.append(createEl('span', '', r.label), createEl('code', '', r.code));
+
+          const glyph = createEl('div', 'glyph-display', item.char);
+          glyph.lang = r.code;
+
+          card.append(label, glyph, createEl('div', 'region-note', item.notes[r.code]));
+          boxes.append(card);
+        }
+
+        row.append(info, boxes);
+        fragment.append(row);
+      }
+
+      container.append(fragment);
     }
 
-    function setGenericFamily(family) {
-      currentFamily = family;
-      document.getElementById('btn-sans').classList.toggle('active', family === 'sans-serif');
-      document.getElementById('btn-serif').classList.toggle('active', family === 'serif');
-      renderLiveTester();
-      renderShowcase();
+    function setupToolbar(previewRoot) {
+      const toolbar = document.querySelector('[role="toolbar"]');
+      const buttons = Array.from(toolbar.querySelectorAll('button[data-family]'));
+
+      function selectFamily(targetBtn) {
+        const family = targetBtn.dataset.family;
+        previewRoot.dataset.fontFamily = family;
+        for (const btn of buttons) {
+          btn.setAttribute('aria-pressed', String(btn === targetBtn));
+        }
+      }
+
+      for (const btn of buttons) {
+        btn.addEventListener('click', () => selectFamily(btn));
+      }
+
+      if (!('focusGroup' in HTMLElement.prototype)) {
+        buttons.forEach((b, i) => {
+          b.tabIndex = i === 0 ? 0 : -1;
+        });
+
+        toolbar.addEventListener('focusin', ({ target }) => {
+          if (!buttons.includes(target)) return;
+          for (const b of buttons) {
+            b.tabIndex = b === target ? 0 : -1;
+          }
+        });
+
+        toolbar.addEventListener('keydown', (e) => {
+          const idx = buttons.indexOf(document.activeElement);
+          if (idx === -1) return;
+
+          const rtl = getComputedStyle(toolbar).direction === 'rtl';
+          const steps = {
+            ArrowRight: rtl ? -1 : 1,
+            ArrowLeft: rtl ? 1 : -1
+          };
+
+          let nextIdx = null;
+          if (e.key in steps) {
+            nextIdx = (idx + steps[e.key] + buttons.length) % buttons.length;
+          } else if (e.key === 'Home') {
+            nextIdx = 0;
+          } else if (e.key === 'End') {
+            nextIdx = buttons.length - 1;
+          }
+
+          if (nextIdx !== null) {
+            e.preventDefault();
+            buttons[nextIdx].focus();
+          }
+        });
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      const previewRoot = document.getElementById('preview-root');
+      const liveGrid = document.getElementById('live-grid');
       const inputEl = document.getElementById('custom-input');
       const sliderEl = document.getElementById('size-slider');
       const sizeValEl = document.getElementById('size-val');
 
-      inputEl.addEventListener('input', renderLiveTester);
-      sliderEl.addEventListener('input', (e) => {
-        currentTestSize = e.target.value;
-        sizeValEl.textContent = `${currentTestSize}px`;
-        renderLiveTester();
+      const glyphNodes = initLiveTester(inputEl.value || '骨');
+      initShowcase();
+      setupToolbar(previewRoot);
+
+      inputEl.addEventListener('input', () => {
+        const text = inputEl.value || '骨';
+        for (const node of glyphNodes) {
+          node.textContent = text;
+        }
       });
 
-      renderLiveTester();
-      renderShowcase();
+      sliderEl.addEventListener('input', () => {
+        const sizePx = `${sliderEl.value}px`;
+        liveGrid.style.setProperty('--test-size', sizePx);
+        sizeValEl.textContent = sizePx;
+        sliderEl.setAttribute('aria-valuetext', sizePx);
+      });
     });
   </script>
 </body>
